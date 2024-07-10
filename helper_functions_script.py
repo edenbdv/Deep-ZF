@@ -6,6 +6,9 @@ import numpy as np
 import os
 import pandas as pd
 from shutil import copyfile
+import logomaker
+import matplotlib.pyplot as plt
+
 import  main_PWMpredictor
 from BindZF_predictor.code import main_bindzfpredictor_predict
 import glob
@@ -317,6 +320,8 @@ def run_deepzf_for_protein(protein_seq, num_protein):
     run_bindzf(num_protein)
     run_pwmPredictor(num_protein)
     pwm_per_predictions()
+    logo()
+
 
 def pwm_per_predictions():
     predictions_file_path = "PWMpredictor/code/predictions.txt"
@@ -353,3 +358,28 @@ def pwm_per_predictions():
         file_count += 1
 
     print(f"Files saved in directory '{directory}'.")
+
+
+
+def logo():
+    # Read data from the text file
+    predictions_file_path = "PWMpredictor/code/predictions.txt"
+
+    # Load the data from the file into a NumPy array
+    matrix_data = np.loadtxt(predictions_file_path, delimiter='\t')
+
+    # Convert NumPy array to pandas DataFrame
+    df = pd.DataFrame(matrix_data, columns=['A', 'C', 'G', 'T'])
+
+    # Print the DataFrame to verify
+    print("DataFrame with updated column names:")
+    print(df)
+
+    # Create a Logo object
+    logo = logomaker.Logo(df)
+
+    # Customize the appearance if needed
+    logo.style_spines(visible=False)
+
+    # Save the logo to a PNG file
+    plt.savefig('logo_output.png', format='png')
