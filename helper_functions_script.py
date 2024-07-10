@@ -1,5 +1,7 @@
 import re
 import csv
+import shutil
+
 import numpy as np
 import os
 import pandas as pd
@@ -190,9 +192,8 @@ def pwm_format():
       for row in formatted_probs:
           output_file.write("\t".join(map(str, row)) + "\n")
 
-def run_deepzf_for_protein(protein_seq, num_protein):
-    # First model:
 
+def pre_bindzf(protein_seq, num_protein):
     zf_lst = find_zf_binding_domains(protein_seq)
     if not zf_lst:
         print("No zinc finger binding domains found.")
@@ -200,15 +201,21 @@ def run_deepzf_for_protein(protein_seq, num_protein):
 
     create_zf_dataset(zf_lst, num_protein)
 
-    input_file_path = os.path.join('Results', 'zf_40_dataset1.csv')
+    extracted_zf_list = [item[0] for item in zf_lst]
 
+    print("extracted_zf_list:\n", extracted_zf_list)
+
+    return extracted_zf_list
+
+
+def run_bindzf(num_protein):
+    input_file_path = os.path.join('Results', 'zf_40_dataset1.csv')
     output_file_path = f"/Results/results{num_protein}.tsv"
     print(output_file_path)
     print("trying to get into model1")
 
-
     # Define the paths to your files
-    #output_file_path = "BindZF_predictor/code/results1.tsv"
+    # output_file_path = "BindZF_predictor/code/results1.tsv"
     output_file_path = "results1.tsv"
     model_file_path = "BindZF_predictor/code/model.p"
     encoder_file_path = "BindZF_predictor/code/encoder.p"
@@ -233,13 +240,24 @@ def run_deepzf_for_protein(protein_seq, num_protein):
     except subprocess.CalledProcessError as e:
         print(f"Error running command: {e}")
 
+    predictions = []
+    try:
+        with open(output_file_path, 'r') as file:
+            for line in file:
+                prediction_float = float(line.strip())  # Convert to float
+                rounded_prediction = round(prediction_float,1)
+                predictions.append(rounded_prediction)
+    except FileNotFoundError:
+        print(f"Error: File {output_file_path} not found.")
+        return None
+    except Exception as e:
+        print(f"Error reading file: {e}")
+        return None
 
+    print("predictions:\n",predictions)
+    return predictions
 
-    with open(output_file_path, 'r') as file:
-        print(file.read())
-
-    # Second model:
-
+def run_pwmPredictor(num_protein):
     create_pwm_dataset(num_protein)
     src_path = 'Data/PWMpredictor/c_rc_df.csv'
     dest_path = 'Data/PWMpredictor/c_rc_df_copy.csv'
@@ -253,6 +271,7 @@ def run_deepzf_for_protein(protein_seq, num_protein):
     output_file_path = 'PWMpredictor/code/predictions.txt'
     model_file_path = 'PWMpredictor/code/transfer_model100.h5'
 
+    python_executable = sys.executable
     # Construct the command to run your script with arguments
     command = [
         python_executable,
@@ -278,7 +297,8 @@ def run_deepzf_for_protein(protein_seq, num_protein):
             line = file.readline()
             if not line:
                 break  # Exit the loop if EOF is reached
-            print( line.strip())  # Print each line without trailing newline characters
+            print(
+                line.strip())  # Print each line without trailing newline characters
 
     # Count the total number of lines in the file
     with open(file_path, 'r') as file:
@@ -286,5 +306,50 @@ def run_deepzf_for_protein(protein_seq, num_protein):
 
     print(f"Total number of lines: {line_count}")
 
-    predictions_file_path = "/PWMpredictor/code/predictions.txt"
+    predictions_file_path = "PWMpredictor/code/predictions.txt"
     return predictions_file_path
+
+
+
+
+def run_deepzf_for_protein(protein_seq, num_protein):
+    pre_bindzf(protein_seq, num_protein)
+    run_bindzf(num_protein)
+    run_pwmPredictor(num_protein)
+    pwm_per_predictions()
+
+def pwm_per_predictions():
+    predictions_file_path = "PWMpredictor/code/predictions.txt"
+    with open(predictions_file_path, 'r') as file:
+        predictions = file.readlines()
+
+    directory = "pwm_per_zf"
+
+
+    # Ensure the directory exists or create it if it doesn't
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    else:
+        # If directory exists, remove all files inside it
+        for filename in os.listdir(directory):
+            file_path = os.path.join(directory, filename)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                elif os.path.isdir(file_path):
+                    shutil.rmtree(file_path)
+            except Exception as e:
+                print(f"Failed to delete {file_path}. Reason: {e}")
+
+    # Write chunks of 3 lines to separate files
+    chunk_size = 3
+    file_count = 1
+    for i in range(0, len(predictions), chunk_size):
+        chunk = predictions[i:i + chunk_size]
+        file_name = os.path.join(directory, f'predictions_{file_count}.txt')
+        with open(file_name, 'w') as f:
+            for line in chunk:
+                f.write(line)
+        file_count += 1
+
+    print(f"Files saved in directory '{directory}'.")
