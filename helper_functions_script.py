@@ -70,7 +70,9 @@ def create_zf_dataset(zf_lst,num_protein):
     print(f"ZF dataset created successfully. Saved to {file_path}")
 
 
-def create_pwm_dataset(num_protein):
+def create_pwm_dataset(num_protein,threshold=0.5):
+    print("threshold in create_pwm_dataset: ", threshold)
+
     # Read TSV file into a pandas DataFrame without header
     tsv_file_path = f'results{num_protein}.tsv'
     tsv_df = pd.read_csv(tsv_file_path, delimiter='\t', header=None)
@@ -98,7 +100,7 @@ def create_pwm_dataset(num_protein):
     df = pd.read_csv(result_csv_file_path)
 
     # Define the condition to filter rows based on the 'prob' column
-    condition = df['probabilities'] > 0.5
+    condition = df['probabilities'] >= threshold
 
     # Use the condition to filter rows and create a new DataFrame without those rows
     filtered_df = df[condition]
@@ -260,8 +262,9 @@ def run_bindzf(num_protein):
     print("predictions:\n",predictions)
     return predictions
 
-def run_pwmPredictor(num_protein):
-    create_pwm_dataset(num_protein)
+def run_pwmPredictor(num_protein, threshold=0.5):
+    print("threshold in run_pwmPredictor: ", threshold)
+    create_pwm_dataset(num_protein,threshold)
     src_path = 'Data/PWMpredictor/c_rc_df.csv'
     dest_path = 'Data/PWMpredictor/c_rc_df_copy.csv'
     copyfile(src_path, dest_path)
@@ -315,10 +318,10 @@ def run_pwmPredictor(num_protein):
 
 
 
-def run_deepzf_for_protein(protein_seq, num_protein):
+def run_deepzf_for_protein(protein_seq, num_protein, threshold=0.5):
     pre_bindzf(protein_seq, num_protein)
     run_bindzf(num_protein)
-    run_pwmPredictor(num_protein)
+    run_pwmPredictor(num_protein,threshold)
     pwm_per_predictions()
     logo()
 

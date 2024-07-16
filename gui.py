@@ -111,14 +111,19 @@ def show_gui(protein_seq, zf_list, predictions, threshold=0.5):
     blue_label.pack(side=LEFT, padx=10)
 
     # Create buttons for each zinc finger domain that passed the threshold
+    green_count = 0
 
     for idx, (zf_seq, prediction) in enumerate(zip(zf_list, predictions),
                                                start=1):
         if prediction >= threshold:
-            pwm_button = Button(root, text=f"Display PWM {idx}",
-                                command=lambda seq=idx: display_pwm_file(
-                                    f"pwm_per_zf/predictions_{seq}.txt"))
+            green_count += 1
+            file_path= f"pwm_per_zf/predictions_{green_count}.txt"
+            pwm_button = Button(root, text=f"Display PWM {green_count}",
+                                command=lambda  path=file_path: display_pwm_file(path))
             pwm_button.pack(pady=5)
+            with open(file_path, 'r') as file:
+                first_line = file.readline()
+                print(f"First row of {file_path}: {first_line.strip()}")
 
         # Place the "Show Logo" button on the right side
     show_logo_button = Button(root, text="Show Logo", command=show_logo,
@@ -129,7 +134,7 @@ def show_gui(protein_seq, zf_list, predictions, threshold=0.5):
 
 def display_pwm_file(file_path):
     # all the results are in pwm_per_zf dir
-
+    print("file_path in display:",file_path)
     # Function to display the contents of a PWM file
     pwm_root = Tk()
     pwm_root.geometry("700x500")
@@ -148,8 +153,6 @@ def display_pwm_file(file_path):
         text_area.insert(END, f"Error: File '{file_path}' not found.")
 
         # Function to save PWM content to a file
-        # Function to save PWM content to a file
-
     def save_pwm():
         save_path = filedialog.asksaveasfilename(defaultextension=".txt",
                                                  filetypes=[
@@ -192,7 +195,7 @@ def get_input_and_display():
     input_seq.delete("1.0", "end")
     input_threshold.delete(0, "end")
 
-    run_pwmPredictor(1)
+    run_pwmPredictor(1,threshold)
     pwm_per_predictions()
 
     # Call function to create GUI with protein sequence, highlighted domains, and predictions
