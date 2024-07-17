@@ -20,9 +20,11 @@ The deepZF pipeline enables biologists to input a specific protein sequence and 
    
 6. **Output**:
    - Providing the PWM matrix as the final output, reflecting zinc finger binding preferences derived from the input protein sequence.
-   - In addition,the user will be able to see the LogoSeq for all fingers whose probability is above the given threshold.
 
 ![‏‏4](https://github.com/user-attachments/assets/725090db-aaa9-4e76-ad58-2b346caf29f8)
+
+   - In addition,the user will be able to see the LogoSeq for all fingers whose probability is above the given threshold.
+
    - ![‏‏3](https://github.com/user-attachments/assets/de1a0965-c2fa-4931-899b-58e1a5bf3a0f)
 
 
