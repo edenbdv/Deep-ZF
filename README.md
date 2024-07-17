@@ -1,15 +1,32 @@
-# DeepZF pipeline:
+# DeepZF pipeline
 
-The deepZF pipeline enables biologists to input a specific protein sequence and receive as output the probability matrix of zinc finger binding preferences for each nucleotide triplet. The pipeline consists of several steps: identifying zinc finger motifs using regular expressions, passing them to the first deep learning model (BindZFpredictor), filtering the model's output using a binding threshold, transferring the filtered results to the second model (PWMpredictor), concatenating the probability matrices of all zinc fingers, converting the concatenated matrix to PWM format, and finally returning it as output to the biologist.
+The deepZF pipeline enables biologists to input a specific protein sequence and receive as output the probability matrix of zinc finger binding preferences for each nucleotide triplet. The pipeline consists of several steps:
+
+1. **Identifying Zinc Finger Motifs**: Using regular expressions to detect zinc finger motifs within the protein sequence.
+   
+2. **First Deep Learning Model (BindZFpredictor)**:
+   - Predicting binding probabilities for identified zinc finger motifs.
+   - Filtering the model's output using a specified binding threshold.
+   
+3. **Second Model (PWMpredictor)**:
+   - Transferring filtered results to predict PWM (Position Weight Matrix) preferences.
+   
+4. **Concatenating Probability Matrices**:
+   - Combining the probability matrices of all zinc fingers into a unified matrix.
+   
+5. **Converting to PWM Format**:
+   - Converting the concatenated matrix into PWM format, which represents zinc finger binding preferences.
+   
+6. **Output**:
+   - Providing the PWM matrix as the final output, reflecting zinc finger binding preferences derived from the input protein sequence.
 
 **Usage**
 
 To use the deepZF pipeline:
-
-Input a protein sequence of interest.
-Run the script, which will:
-Identify zinc finger motifs.
-Predict binding probabilities using specified models.
-Filter and concatenate results.
-Convert the concatenated matrix to PWM format.
-Receive the PWM matrix as output, representing zinc finger binding preferences.
+- Input a protein sequence of interest.
+- Run the script, which will:
+  - Identify zinc finger motifs.
+  - Predict binding probabilities using specified models.
+  - Filter and concatenate results.
+  - Convert the concatenated matrix to PWM format.
+- Receive the PWM matrix as output, representing zinc finger binding preferences.
