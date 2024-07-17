@@ -100,6 +100,8 @@ def create_pwm_dataset(num_protein,threshold=0.5):
     df = pd.read_csv(result_csv_file_path)
 
     # Define the condition to filter rows based on the 'prob' column
+    # df['probabilities_rounded'] = df['probabilities'].round(2)
+
     condition = df['probabilities'] >= threshold
 
     # Use the condition to filter rows and create a new DataFrame without those rows
@@ -250,7 +252,7 @@ def run_bindzf(num_protein):
         with open(output_file_path, 'r') as file:
             for line in file:
                 prediction_float = float(line.strip())  # Convert to float
-                rounded_prediction = round(prediction_float,1)
+                rounded_prediction = round(prediction_float,2)
                 predictions.append(rounded_prediction)
     except FileNotFoundError:
         print(f"Error: File {output_file_path} not found.")

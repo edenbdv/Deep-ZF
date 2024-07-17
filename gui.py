@@ -70,8 +70,9 @@ def show_gui(protein_seq, zf_list, predictions, threshold=0.5):
 
     text_area.insert(END, spaced_protein_seq)
 
-    offset = 6
-    predictions = [float(pred) for pred in predictions]
+    offset = 7
+    predictions = [f"{float(pred):.2f}" for pred in predictions]
+
 
     # Highlight all ZF domains and display their predictions
     for idx, (zf_seq, prediction) in enumerate(zip(zf_list, predictions),
@@ -87,7 +88,7 @@ def show_gui(protein_seq, zf_list, predictions, threshold=0.5):
             # print(
             #     f"Found ZF domain {zf_seq} at position {start}-{end} (adjusted: {adjusted_start}-{adjusted_end})")
 
-            if prediction >= threshold:
+            if float(prediction) >= threshold:
                 bg_color = "green"
                 fg_color = "white"
             else:
@@ -129,7 +130,7 @@ def show_gui(protein_seq, zf_list, predictions, threshold=0.5):
 
     for idx, (zf_seq, prediction) in enumerate(zip(zf_list, predictions),
                                                start=1):
-        if prediction >= threshold:
+        if float(prediction) >= threshold:
             green_count += 1
             file_path= f"pwm_per_zf/predictions_{green_count}.txt"
             pwm_button = Button(root, text=f"Display PWM {green_count}",
@@ -211,6 +212,7 @@ def get_input_and_display():
 
     run_pwmPredictor(1,threshold)
     pwm_per_predictions()
+    logo()
 
     # Call function to create GUI with protein sequence, highlighted domains, and predictions
     show_gui(protein_seq, extracted_zf_list, predictions, threshold)
