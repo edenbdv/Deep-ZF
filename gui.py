@@ -70,13 +70,23 @@ def show_gui(protein_seq, zf_list, predictions, threshold=0.5):
 
     text_area.insert(END, spaced_protein_seq)
 
+    offset = 6
+    predictions = [float(pred) for pred in predictions]
+
     # Highlight all ZF domains and display their predictions
     for idx, (zf_seq, prediction) in enumerate(zip(zf_list, predictions),
                                                start=1):
-        start = spaced_protein_seq.find(zf_seq)
-        end = start + len(zf_seq)
+        if (idx>1):
+            start = spaced_protein_seq.find(zf_seq) + offset*(idx-1)
+        else:
+            start = spaced_protein_seq.find(zf_seq)
 
-        while start != -1:
+        while start!= -1:
+            end = start + len(zf_seq)
+            # Adjusted start and end for the text area, accounting for the offset
+            # print(
+            #     f"Found ZF domain {zf_seq} at position {start}-{end} (adjusted: {adjusted_start}-{adjusted_end})")
+
             if prediction >= threshold:
                 bg_color = "green"
                 fg_color = "white"
@@ -84,11 +94,13 @@ def show_gui(protein_seq, zf_list, predictions, threshold=0.5):
                 bg_color = "blue"
                 fg_color = "white"
 
-            text_area.tag_add(f"zf_{idx}", f"1.{start}", f"1.{end}")
+            text_area.tag_add(f"zf_{idx}", f"1.{start}",
+                              f"1.{end}")
             text_area.tag_config(f"zf_{idx}", background=bg_color,
                                  foreground=fg_color)
 
             # Display prediction next to the zinc finger domain
+            prediction_text = f"({prediction}) "
             prediction_pos = f"1.{end}"
             text_area.insert(prediction_pos, f"({prediction}) ",
                              f"prediction_{idx}")
@@ -97,7 +109,9 @@ def show_gui(protein_seq, zf_list, predictions, threshold=0.5):
             text_area.tag_config(f"prediction_{idx}", foreground=bg_color)
 
             start = spaced_protein_seq.find(zf_seq, start + 1)
-            end = start + len(zf_seq)
+            # Update the offset for the next sequence to account for the inserted prediction text
+            # offset += 6
+
     # Add legend for color coding
     legend_frame = Frame(root)
     legend_frame.pack(pady=10)
@@ -123,7 +137,7 @@ def show_gui(protein_seq, zf_list, predictions, threshold=0.5):
             pwm_button.pack(pady=5)
             with open(file_path, 'r') as file:
                 first_line = file.readline()
-                print(f"First row of {file_path}: {first_line.strip()}")
+                # print(f"First row of {file_path}: {first_line.strip()}")
 
         # Place the "Show Logo" button on the right side
     show_logo_button = Button(root, text="Show Logo", command=show_logo,
@@ -172,7 +186,7 @@ def get_input_and_display():
     # Function to get input from user and display the GUI
     protein_seq = input_seq.get("1.0", "end-1c")
     threshold = float(
-        input_threshold.get()) if input_threshold.get().strip() else 0.5  # Default threshold is 0.5 if not provided
+    input_threshold.get()) if input_threshold.get().strip() else 0.5  # Default threshold is 0.5 if not provided
 
     extracted_zf_list = pre_bindzf(protein_seq, 1)
 
@@ -186,9 +200,9 @@ def get_input_and_display():
     predictions = run_bindzf(1)
 
     # predictions = [
-    #     0.8, 0.7, 0.6, 0.61,
-    #     0.4, 0.49, 0.9, 1,
-    #     0, 0.1, 0.7
+    #     0.8, 0.7, 0.6, 0.6,
+    #     0.4, 0.4, 0.9, 1.0,
+    #     0.0, 0.1, 0.7
     # ]
 
     # Clear the input fields
