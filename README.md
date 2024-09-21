@@ -1,5 +1,5 @@
 # DeepZF pipeline
-
+This project is about using deep leraning concepts as neural networks for biological needs.
 The deepZF pipeline enables biologists to input a specific protein sequence and receive as output the probability matrix of zinc finger binding preferences for each nucleotide triplet. The pipeline consists of several steps:
 
 1. **Identifying Zinc Finger Motifs**: Using regular expressions to detect zinc finger motifs within the protein sequence.
